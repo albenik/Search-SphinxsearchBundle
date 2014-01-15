@@ -176,8 +176,11 @@ class Sphinxsearch
 		 * Perform the query.
 		 */
 		$results = $this->sphinx->query($query, $indexNames);
-		if( $results['status'] !== SEARCHD_OK )
+		if( $results['status'] === SEARCHD_ERROR )
 			throw new \RuntimeException(sprintf('Searching index "%s" for "%s" failed with error "%s".', $label, $query, $this->sphinx->getLastError()));
+
+		if( $results['status'] === SEARCHD_RETRY )
+			throw new \RuntimeException(sprintf('Searching index "%s" for "%s" failed with retry "%s".', $label, $query, $this->sphinx->getLastError()));
 
 		return $results;
 	}
